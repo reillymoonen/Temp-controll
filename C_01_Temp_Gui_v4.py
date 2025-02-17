@@ -1,5 +1,6 @@
 from tkinter import *
 import all_constants as c
+import conversion_rounding as cr
 
 class Converter():
     """
@@ -110,8 +111,10 @@ class Converter():
         """
 
         if min_temp == c.ABS_ZERO_CELSIUS:
+            answer = cr.to_fahrenheit(to_convert)
             self.answer_error.config(text=f"Converting {to_convert} °C to °F")
         else:
+            answer = cr.to_celsius(to_convert)
             self.answer_error.config(text=f"Converting {to_convert} °F to °C")
 
 # main routine
