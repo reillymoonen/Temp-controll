@@ -12,6 +12,9 @@ class Converter():
         Temperature converter GUI
         """
 
+
+        self.all_calculations_list = []
+
         self.temp_frame = Frame(padx=10, pady=10)
         self.temp_frame.grid()
 
@@ -65,7 +68,8 @@ class Converter():
             self.button_ref_list.append(self.make_button)
 
         #retreive 'history / export' button and disable it at the start
-        self.to_history_button = self.button_ref_list[3].config(state=DISABLED)
+        self.to_history_button = self.button_ref_list[3]
+        self.to_history_button.config(state=DISABLED)
 
 
     def check_temp(self,min_temp):
@@ -104,7 +108,6 @@ class Converter():
             self.temp_entry.delete(0, END)
 
     def convert(self, min_temp, to_convert):
-
         """
         Converts temperatures and updates answer label. Also stores
         calculations for Export / History feature
@@ -112,10 +115,17 @@ class Converter():
 
         if min_temp == c.ABS_ZERO_CELSIUS:
             answer = cr.to_fahrenheit(to_convert)
-            self.answer_error.config(text=f"Converting {to_convert} °C to °F")
+            answer_statement = f"{to_convert}°C is °F: {answer}°F"
         else:
             answer = cr.to_celsius(to_convert)
-            self.answer_error.config(text=f"Converting {to_convert} °F to °C")
+            answer_statement = f"{to_convert}°F is °C: {answer}°C"
+
+        # enable history export button as soon as we have a valid calculation
+        self.to_history_button.config(state=NORMAL)
+
+        self.answer_error.config(text=answer_statement)
+        self.all_calculations_list.append(answer_statement)
+        print(self.all_calculations_list)
 
 # main routine
 
