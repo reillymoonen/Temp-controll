@@ -1,5 +1,6 @@
 from tkinter import *
 from functools import partial  # To prevent unwanted windows
+import all_constants as c
 
 
 class Converter:
@@ -11,6 +12,11 @@ class Converter:
         """
         Temperature converter GUI
         """
+
+        self.all.calculations_list = [['10.0°F is °C: -12°C', '20.0°F is °C: -7°C',
+                                       '30.0°F is °C: -1°C', '40.0°F is °C: 4°C',
+                                       '50.0°F is °C: 10°C', '60.0°F is °C: 16°C']
+]
 
         self.temp_frame = Frame(padx=10, pady=10)
         self.temp_frame.grid()
@@ -28,7 +34,7 @@ class Converter:
         Opens history dialog box and disables history button
         (so that users can't create multiple history boxes).
         """
-        HistoryExport(self)
+        HistoryExport(self, self.all.calculations_list)
 
 
 class HistoryExport:
@@ -36,10 +42,7 @@ class HistoryExport:
     Displays history dialog box
     """
 
-    def __init__(self, partner):
-        # setup dialog box and background colour
-        green_back = "#D5E8D4"
-        peach_back = "#FFe6cc"
+    def __init__(self, partner, calculations):
 
         self.history_box = Toplevel()
 
@@ -54,10 +57,19 @@ class HistoryExport:
         self.history_frame = Frame(self.history_box)
         self.history_frame.grid()
 
+        # background colour and text for calculations area
+        if len(calculations) <= c.MAX_CALCS:
+            calc_back = "#D5E8D4"
+            calc_amount = "all your"
+        else:
+            calc_back = "#FFe6cc"
+            calc_amount = (f"your recent calculations - "
+                           f"showing {c.MAX_CALCS} / {len(calculations)}")
+
+
         # strings for 'long' labels...
-        recent_intro_txt = ("Below are your recent calculations - showing "
-                            "3 / 3 calculations. All calculations are "
-                            "shown to the nearest degree")
+        recent_intro_txt = (f"Below are {calc_amount} calculations. "
+                            f"to the nearest degree")
 
         calculations = ""
 
@@ -68,7 +80,7 @@ class HistoryExport:
         history_label_list = [
             ["History / Export", ("Arial", "16", "bold"), None],
             [recent_intro_txt, ("Arial", "11"), None],
-            ["calculations list", ("Arial", "14"), green_back],
+            ["calculations list", ("Arial", "14"), calc_back],
             [export_instructions_txt, ("Arial", "11"), None]
         ]
 
