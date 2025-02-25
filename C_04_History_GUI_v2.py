@@ -13,10 +13,10 @@ class Converter:
         Temperature converter GUI
         """
 
-        self.all.calculations_list = [['10.0°F is °C: -12°C', '20.0°F is °C: -7°C',
-                                       '30.0°F is °C: -1°C', '40.0°F is °C: 4°C',
-                                       '50.0°F is °C: 10°C', '60.0°F is °C: 16°C']
-]
+        # Corrected variable name: self.all_calculations_list
+        self.all_calculations_list = [['10.0°F is °C: -12°C', '20.0°F is °C: -7°C',
+                                      '30.0°F is °C: -1°C', '40.0°F is °C: 4°C',
+                                      '50.0°F is °C: 10°C', '60.0°F is °C: 16°C']]
 
         self.temp_frame = Frame(padx=10, pady=10)
         self.temp_frame.grid()
@@ -34,7 +34,7 @@ class Converter:
         Opens history dialog box and disables history button
         (so that users can't create multiple history boxes).
         """
-        HistoryExport(self, self.all.calculations_list)
+        HistoryExport(self, self.all_calculations_list)  # Corrected variable name
 
 
 class HistoryExport:
@@ -66,12 +66,9 @@ class HistoryExport:
             calc_amount = (f"your recent calculations - "
                            f"showing {c.MAX_CALCS} / {len(calculations)}")
 
-
         # strings for 'long' labels...
         recent_intro_txt = (f"Below are {calc_amount} calculations. "
                             f"to the nearest degree")
-
-        calculations = ""
 
         export_instructions_txt = ("To export your calculation history, "
                                    "click the 'Export' button below.")
