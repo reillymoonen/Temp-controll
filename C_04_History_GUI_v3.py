@@ -16,7 +16,7 @@ class Converter:
         # Corrected variable name: self.all_calculations_list
         self.all_calculations_list = ['10.0°F is °C: -12°C', '20.0°F is °C: -7°C',
                                       '30.0°F is °C: -1°C', '40.0°F is °C: 4°C',
-                                      '50.0°F is °C: 10°C', '60.0°F is °C: 16°C']
+                                      '50.0°F is °C: 10°C', 'This is a test']
 
         self.temp_frame = Frame(padx=10, pady=10)
         self.temp_frame.grid()
@@ -145,3 +145,6 @@ if __name__ == "__main__":
     root.title("Temperature Converter")
     Converter()
     root.mainloop()
+
+
+video 13 at 1:38
