@@ -2,6 +2,8 @@ from tkinter import *
 from functools import partial  # To prevent unwanted windows
 import all_constants as c
 import conversion_rounding as cr
+from datetime import date
+
 
 
 class Converter:
@@ -53,7 +55,7 @@ class Converter:
             ["To Celsius", "#990099", lambda: self.check_temp(c.ABS_ZERO_FAHRENHEIT), 0, 0],
             ["To Fahrenheit", "#009900", lambda: self.check_temp(c.ABS_ZERO_CELSIUS), 0, 1],
             ["Help / Info", "#CC6600", self.help_info, 1, 0],  # Fixed: Changed to self.help_info
-            ["History / Export", "#004C99", "", 1, 1]
+            ["History / Export", "#004C99", self.to_history, 1, 1]
         ]
 
         # List to hold buttons once they have been made
@@ -134,6 +136,14 @@ class Converter:
         DisplayHelp(self)
 
 
+    def to_history(self):
+        """
+        Opens history dialog box and disables history button
+        (so that users can't create multiple history boxes).
+        """
+        HistoryExport(self, self.all_calculations_list)  # Corrected variable name
+
+
 class DisplayHelp:
 
     def __init__(self, partner):
@@ -198,6 +208,137 @@ class DisplayHelp:
         # Put help button back to normal
         partner.to_help_button.config(state=NORMAL)
         self.help_box.destroy()
+
+
+class HistoryExport:
+    """
+    Displays history dialog box
+    """
+
+    def __init__(self, partner, calculations):
+
+        self.history_box = Toplevel()
+
+        # disable history button
+        partner.to_history_button.config(state=DISABLED)
+
+        # If users press cross at top, closes history and
+        # 'releases' history button
+        self.history_box.protocol('WM_DELETE_WINDOW',
+                                  partial(self.close_history, partner))
+
+        self.history_frame = Frame(self.history_box)
+        self.history_frame.grid()
+
+        # background colour and text for calculations area
+        if len(calculations) <= c.MAX_CALCS:
+            calc_back = "#D5E8D4"
+            calc_amount = "all your"
+        else:
+            calc_back = "#FFe6cc"
+            calc_amount = (f"your recent calculations - "
+                           f"showing {c.MAX_CALCS} / {len(calculations)}")
+
+        # strings for 'long' labels...
+        recent_intro_txt = (f"Below are {calc_amount} calculations. "
+                            f"to the nearest degree")
+
+        # Create string from calculations list (newest calculations first)
+        newest_first_string = ""
+        newest_first_list = list(reversed(calculations))
+
+        if len(newest_first_list) <= c.MAX_CALCS:
+
+            for item in newest_first_list[:-1]:
+                newest_first_string += item + "\n"
+
+            newest_first_string += newest_first_list[-1]
+        else:
+            for item in newest_first_list[:c.MAX_CALCS-1]:
+                newest_first_string += item + "\n"
+
+            newest_first_string += newest_first_list[c.MAX_CALCS-1]
+
+        export_instructions_txt = ("To export your calculation history, "
+                                   "click the 'Export' button below.")
+
+        # Label list (label text | format | bg)
+        history_label_list = [
+            ["History / Export", ("Arial", "16", "bold"), None],
+            [recent_intro_txt, ("Arial", "11"), None],
+            [newest_first_string, ("Arial", "14"), calc_back],
+            [export_instructions_txt, ("Arial", "11"), None]
+        ]
+
+        history_label_ref = []
+        for count, item in enumerate(history_label_list):
+            make_label = Label(self.history_frame, text=item[0], font=item[1],
+                               bg=item[2],
+                               wraplength=300, justify="left", pady=10, padx=20)
+            make_label.grid(row=count, column=0)
+            history_label_ref.append(make_label)
+
+        # Retrieve export instruction label so that we can
+        # configure it to show the filename if the user exports the file
+        self.export_filename_label = history_label_ref[3]
+
+        # make frame to hold buttons (two columns)
+        self.hist_button_frame = Frame(self.history_box)
+        self.hist_button_frame.grid(row=4)
+
+        button_ref_list = []
+
+        # button list (button text | bg colour | command | row | column)
+        button_details_list = [
+            ["Export", "#DD4C99", lambda: self.export_data(calculations), 0, 0],
+            ["Close", "#666666", partial(self.close_history, partner), 0, 1],
+        ]
+
+        for btn in button_details_list:
+            make_button = Button(self.hist_button_frame,
+                                 font=("Arial", "12", "bold"),
+                                 text=btn[0], bg=btn[1],
+                                 fg="#ffffff", width=12,
+                                 command=btn[2])
+            make_button.grid(row=btn[3], column=btn[4], padx=10, pady=10)
+            button_ref_list.append(make_button)
+
+    def export_data(self, calculations):
+        # **** Get current date for heading and filename ****
+        today = date.today()
+
+        # Get day, month and year as individual strings
+        day = today.strftime("%d")
+        month = today.strftime("%B")
+        year = today.strftime("%Y")
+
+        file_name = f"temperatures_{year}_{month}_{day}"
+
+        # edit label so users know their export has been done
+        success_string = (f"Export successful! File saved as "
+                          f"{file_name}.txt")
+        self.export_filename_label.config(bg="#009900", text=success_string)
+
+        # write data to text file
+        write_to = f"{file_name}.txt"
+
+        with open(write_to, "w") as text_file:
+            text_file.write("**** Temperature Calculations ****\n")
+            text_file.write(f"Generated: {day}/{month}/{year}\n\n")
+            text_file.write("Here is your calculation history (oldest to newest)...\n")
+
+            # write the item to file
+            for item in calculations:
+                text_file.write(item)
+                text_file.write("\n")
+
+    def close_history(self, partner):
+        """
+        Closes history dialog box (and enables history button)
+        """
+        # Put history button back to normal...
+        partner.to_history_button.config(state=NORMAL)
+        self.history_box.destroy()
 
 
 # main routine
