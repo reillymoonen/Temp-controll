@@ -1,6 +1,8 @@
 from tkinter import *
 from functools import partial  # To prevent unwanted windows
 import all_constants as c
+from datetime import date
+
 
 
 class Converter:
@@ -117,7 +119,7 @@ class HistoryExport:
 
         # button list (button text | bg colour | command | row | column)
         button_details_list = [
-            ["Export", "#DD4C99", "", 0, 0],
+            ["Export", "#DD4C99", lambda: self.export_data(calculations), 0, 0],
             ["Close", "#666666", partial(self.close_history, partner), 0, 1],
         ]
 
@@ -129,6 +131,35 @@ class HistoryExport:
                                  command=btn[2])
             make_button.grid(row=btn[3], column=btn[4], padx=10, pady=10)
             button_ref_list.append(make_button)
+
+    def export_data(self, calculations):
+        # **** Get current date for heading and filename ****
+        today = date.today()
+
+        # Get day, month and year as individual strings
+        day = today.strftime("%d")
+        month = today.strftime("%B")
+        year = today.strftime("%Y")
+
+        file_name = f"temperatures_{year}_{month}_{day}"
+
+        # edit label so users know their export has been done
+        success_string = (f"Export successful! File saved as "
+                          f"{file_name}.txt")
+        self.export_filename_label.config(bg="#009900", text=success_string)
+
+        # write data to text file
+        write_to = f"{file_name}.txt"
+
+        with open(write_to, "w") as text_file:
+            text_file.write("**** Temperature Calculations ****\n")
+            text_file.write(f"Generated: {day}/{month}/{year}\n\n")
+            text_file.write("Here is your calculation history (oldest to newest)...\n")
+
+            # write the item to file
+            for item in calculations:
+                text_file.write(item)
+                text_file.write("\n")
 
     def close_history(self, partner):
         """
@@ -145,6 +176,3 @@ if __name__ == "__main__":
     root.title("Temperature Converter")
     Converter()
     root.mainloop()
-
-
-video 13 at 1:38
